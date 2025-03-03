@@ -38,7 +38,6 @@ class Email{
         Person owner;
         string eName;
         string domain;
-        vector<Document> recievedDocs;
         Email(){};
         Email(Person emailOwner,string emailName, string emailDomain){
             owner = emailOwner;
@@ -48,6 +47,11 @@ class Email{
         string GetFullName(){
             return eName + "@" + domain;
         }
+        void RecieveDoc(Document recieveDoc){
+            this->recievedDocs.push_back(recieveDoc);
+        }
+    private:
+         vector<Document> recievedDocs;
 };
 
 void PrintDocAll(Document doc){
@@ -56,7 +60,18 @@ void PrintDocAll(Document doc){
     cout << "Content " << doc.GetContent() << "\n";
 }
 
-void SendDoc(Person sender ){
+void SendDoc(Person sender, Email recieverEmail, string content ){
+    Document tempDoc(sender,recieverEmail.owner,content);
+    recieverEmail.RecieveDoc(tempDoc);
+}
+
+vector<Email> emails;
+
+void PrintAllMails(){
+    for (int i = 0; i < emails.size(); i++)
+    {
+        cout << "Mail: " << emails[i].GetFullName() << "    User: " << emails[i].owner.name << " "<< emails[i].owner.surname << "\n";
+    }
     
 }
 
@@ -74,12 +89,28 @@ int main(){
             cout << "\e[1;34m   Mode commands:    \e[0m\n";
             cout << "msg - sets into message mode enabling to send a 'document'\n";
             cout << "add - sets into add mode enabling to add a user or email\n";
+            cout << "\e[1;34m   Utility:    \e[0m\n";
+            cout << "ls - lists all emails\n";
         }
         else if (command == "msg"){
 
         }
         else if (command == "add"){
-            
+            Person temp;
+            cout << "Name:   Surname:\n";
+            if (cin >> temp.name >> temp.surname)
+            {
+                Email tempMail;
+                cout << "Mail name:     domain:\n";
+                if (cin >> tempMail.eName >> tempMail.domain)
+                {
+                    tempMail.owner = temp;
+                    emails.push_back(tempMail);
+                }
+            }
+        }
+        else if (command == "ls"){
+            PrintAllMails();
         }
         else if (command == "cl"){
             cout << "\033[2J\033[1;1H";
