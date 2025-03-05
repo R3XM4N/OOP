@@ -9,6 +9,9 @@ class Person{
     public:
         string name;
         string surname;
+        string FullName(){
+            return name + " "+ surname;
+        }
         Person(){};
         Person(string usersName,string usersSurname){
             name = usersName;
@@ -32,11 +35,10 @@ class Document{
             return content;
         }
         string GetWhole(){
-            string temp;
-            temp = "Sender: " + sender.name + " " + sender.surname + "\n";
-            temp += "Reciever: " + reciever.name + " " + reciever.surname + "\n";
-            temp += "Content " + GetContent() + "\n";
-            return temp;
+            return "Sender: " + sender.FullName() + "\n" + "Reciever: " + reciever.FullName() + "\n" + "Content " + GetContent() + "\n";
+        }
+        void SetContent(string content_){
+            this->content = content_;
         }
     private:
         string content;
@@ -59,8 +61,11 @@ class Email{
         void RecieveDoc(Document recieveDoc){
             this->recievedDocs.push_back(recieveDoc);
         }
+        vector<Document> recievedDocs;
+        /* We ain't making actual sw here ¯\_(ツ)_/¯ acces modifiers who?
     private:
          vector<Document> recievedDocs;
+        */
 };
 
 void SendDoc(string docName, Person sender, Email recieverEmail, string content ){
@@ -82,7 +87,8 @@ int main(){
     cout << "\033[2J\033[1;1H";
     cout << "\e[1;32mObject oriented programing Doc/Email/Person class example. \nAlso doubling as a proof of concept of a terminal tool in C++.\e[0m\n";
     string command;
-    while(cin >> command){
+    //not good but neither bad, simple app running this is ok.
+    while(cin >> command){ 
         if (command == "help"){
             cout << "\033[2J\033[1;1H";
             cout << "\e[1;34m   Basic commands:    \e[0m\n";
@@ -94,9 +100,11 @@ int main(){
             cout << "add - sets into add mode enabling to add a email\n";
             cout << "del - sets into delete mode enabling the deletion of a email\n";
             cout << "\e[1;34m   Utility:    \e[0m\n";
-            cout << "ls - lists all emails\n";
+            cout << "ls - lists all email adresses saved in the system\n";
+            cout << "hell - Writes all doccuments from each email adress so hell\n";
         }
-        else if (command == "msg"){
+        //maybe doesn't work? Needs to be tested. Well tested and all seems to work ¯\_(ツ)_/¯
+        else if (command == "msg" || command == "send"){
             cout << "\e[1;33mEnter target mail 'name@domain'.\e[0m\n";
             if (cin >> command)
             {
@@ -104,11 +112,18 @@ int main(){
                 {
                     if (emails[i].GetFullName() == command)
                     {
-                        
-                    }
-                    else if (i == emails.size()-1)
-                    {
-                        /* code */
+                        Document tempdoc;
+                        tempdoc.reciever = emails[i].owner;
+                        cout << "\e[1;33mSenders name:\e[0m\n";
+                        cin >> tempdoc.sender.name;
+                        cout << "\e[1;33mSenders surname:\e[0m\n";
+                        cin >> tempdoc.sender.surname;
+                        cout << "\e[1;33mContent/message header:\e[0m\n";
+                        cin >> tempdoc.name;
+                        cout << "\e[1;33mContents of message:\e[0m\n";
+                        cin >> command; tempdoc.SetContent(command);
+                        emails[i].RecieveDoc(tempdoc);
+                        break;
                     }
                     
                 }
@@ -131,7 +146,7 @@ int main(){
                 }
             }
         }
-        else if (command == "del")
+        else if (command == "del" || command == "delete")
         {
             cout << "\e[1;31mType a mail you wish to delete: as 'emailname@domain' or exit via exit.\e[0m\n";
             if (cin >> command)
@@ -149,12 +164,19 @@ int main(){
                             if (i + 1 == emails.size())
                             {
                                 emails.pop_back();
+                                cout << "\e[1;31mSuccesfully removed " + command + ".\e[0m\n";
+                                break;
                             }
                             else{
+                                //So apparently .erase is a thing
                                 emails[i] = emails[emails.size()-1];
                                 emails.pop_back();
+                                cout << "\e[1;31mSuccesfully removed " + command + ".\e[0m\n";
+                                break;
                             }
+                            
                         }
+                        cout << "\e[1;31mDidn't find " + command + ".\e[0m\n";
                     }
                 }
             }
@@ -163,8 +185,17 @@ int main(){
         else if (command == "ls"){
             PrintAllMails();
         }
-        else if (command == "cl"){
+        else if (command == "cl" || command == "clear"){
             cout << "\033[2J\033[1;1H";
+        }
+        else if (command == "hell"){
+            for (int i = 0; i < emails.size(); i++)
+            {
+                for (int y = 0; y < emails[i].recievedDocs.size(); y++)
+                {
+                    cout << emails[i].recievedDocs[y].GetWhole() << "\n";
+                }
+            }
         }
         else if (command == "exit"){
             cout << "\033[2J\033[1;1H";
